@@ -1,94 +1,195 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ImageBackground,
-  SafeAreaView,
-  Image,
-  FlatList,
-} from 'react-native';
+import {View, ImageBackground, Dimensions} from 'react-native';
+import TransferAcountType from './TransferAcountType';
+import ConfirmAcount from './ConfirmAcount';
+import TransactionStatus from './TransactionStatus';
+import ShowModal from './Modal';
 
-const buttons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'X', 0, 'Ok'];
+const {width, height} = Dimensions.get('window');
 
-class AcountSelection extends React.Component {
+class TrtansactionComponent extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: navigation.getParam('header'),
+      headerStyle: {
+        backgroundColor: '#384080',
+      },
+      headerTintColor: '#fff'
+    };
+  };
+  constructor() {
+    super();
+    this.state = {
+      amount: '0',
+      closeButtons: false,
+      openmodal: false,
+      selectedFromAcount: {},
+      selectedToAcount: {},
+      accountType: '',
+      reference: '',
+      todayButton: true,
+      laterButton: '',
+      confirmState: false,
+      transactionDone: false,
+    };
+  }
 
-    renderbutton = (item, key) => (
-        <TouchableOpacity style={{borderWidth: 1, borderRadius: 50, width: 50, height: 50, marginLeft: 20, marginBottom: 20, justifyContent: 'center', borderColor: '#cdcdcd'}} key={key}>
-            <Text style={{padding: 5, textAlign: 'center', fontSize: 16, color: '#cdcdcd'}}>{item}</Text>
-        </TouchableOpacity>
-    )
+  onPressbutton = item => {
+    let {amount} = this.state;
+    if (item !== 'X' && item !== 'Ok') {
+      if (amount == '0') {
+        amount = '';
+      }
+      this.setState({
+        amount: amount + item,
+      });
+    } else if (item === 'X') {
+      this.setState({
+        amount: '0',
+      });
+    } else {
+      this.setState({
+        closeButtons: true,
+      });
+    }
+  };
+
+  cancelPress = () => {
+    this.setState({
+      closeButtons: false,
+    });
+  };
+
+  changeToday = () => {
+    this.setState({
+      todayButton: true,
+      laterButton: false,
+    });
+  };
+
+  changeLater = () => {
+    this.setState({
+      todayButton: false,
+      laterButton: true,
+    });
+  };
+
+  preoccedTransaction = () => {
+    this.setState({
+      confirmState: true,
+    });
+  };
+
+  openModal = (accountType = undefined) => {
+    if (accountType == 'from') {
+      this.setState({
+        openmodal: true,
+        accountType,
+      });
+    } else if (accountType == 'to') {
+      this.setState({
+        openmodal: true,
+        accountType,
+      });
+    } else {
+      this.setState({
+        openmodal: true,
+      });
+    }
+  };
+  closeModal = () => {
+    this.setState({
+      openmodal: false,
+    });
+  };
+
+  selectedAccount = selectedAccount => {
+    const {accountType} = this.state;
+    if (accountType === 'from') {
+      this.setState({
+        selectedFromAcount: selectedAccount,
+      });
+    } else {
+      this.setState({
+        selectedToAcount: selectedAccount,
+      });
+    }
+  };
+
+  onChangeReference = text => {
+    this.setState({
+      reference: text,
+    });
+  };
+
+  cancelConfirm = () => {
+    this.setState({
+      confirmState: false,
+    });
+  }
+  confirmTransaction = () => {
+    this.setState({
+      transactionDone: true,
+    });
+  };
+
   render() {
+    const {
+      amount,
+      closeButtons,
+      openmodal,
+      selectedFromAcount,
+      selectedToAcount,
+      todayButton,
+      laterButton,
+      confirmState,
+      reference,
+      transactionDone,
+    } = this.state;
     return (
       <View style={{flex: 1}}>
         <ImageBackground
-          style={{height: '100%', width: '100%'}}
+          style={{height, width}}
           source={require('../assets/bgvTest.jpeg')}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              marginTop: 30,
-            }}>
-            <View>
-              <Text style={{color: '#fff', fontSize: 17, paddingBottom: 5}}>
-                From
-              </Text>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: '#fff',
-                  flex: 1,
-                  width: 140,
-                  alignItems: 'center',
-                }}>
-                <Image source={require('../assets/own.png')} />
-              </View>
-            </View>
-            <Image
-              style={{tintColor: '#fff', alignSelf: 'center'}}
-              source={require('../assets/rightArrow.png')}
+          {!confirmState && (
+            <TransferAcountType
+              amount={amount}
+              onPressbutton={this.onPressbutton}
+              closeButtons={closeButtons}
+              cancelPress={this.cancelPress}
+              openModal={this.openModal}
+              selectedFromAcount={selectedFromAcount}
+              selectedToAcount={selectedToAcount}
+              changeToday={this.changeToday}
+              changeLater={this.changeLater}
+              todayButton={todayButton}
+              laterButton={laterButton}
+              preoccedTransaction={this.preoccedTransaction}
+              onChangeReference={this.onChangeReference}
             />
-            <View style={{}}>
-              <Text style={{color: '#fff', fontSize: 17, paddingBottom: 5}}>
-                To
-              </Text>
-              <View
-                style={{
-                  borderWidth: 1,
-                  borderColor: '#fff',
-                  flex: 1,
-                  justifyContent: 'center',
-                  width: 140,
-                  alignItems: 'center',
-                }}>
-                <Image source={require('../assets/own.png')} />
-              </View>
-            </View>
-          </View>
-          <View style={{flex: 2, marginTop: 30}}>
-            <Text style={{textAlign: 'center', fontSize: 22, color: '#e0ae22'}}>
-              RM0.00
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'space-around',
-                paddingLeft: '20%',
-                paddingRight: '20%',
-                marginTop: 30
-              }}>
-              {buttons.map((item, index) => this.renderbutton(item, index))}
-            </View>
-          </View>
+          )}
+
+          {confirmState && !transactionDone && (
+            <ConfirmAcount
+              selectedFromAcount={selectedFromAcount}
+              selectedToAcount={selectedToAcount}
+              reference={reference}
+              amount={amount}
+              cancelConfirm={this.cancelConfirm}
+              confirmTransaction={this.confirmTransaction}
+            />
+          )}
+
+          {transactionDone && <TransactionStatus {...this.props} />}
         </ImageBackground>
+        <ShowModal
+          selectedAccount={this.selectedAccount}
+          closeModal={this.closeModal}
+          openmodal={openmodal}
+        />
       </View>
     );
   }
 }
 
-export default AcountSelection;
+export default TrtansactionComponent;

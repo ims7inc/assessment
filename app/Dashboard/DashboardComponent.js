@@ -3,11 +3,9 @@ import {
   View,
   Text,
   TouchableOpacity,
-  TextInput,
   ImageBackground,
-  SafeAreaView,
   Image,
-  FlatList,
+  StyleSheet,
 } from 'react-native';
 
 var renderContent = [
@@ -30,6 +28,16 @@ var renderContent = [
 ];
 
 class DashboardComponent extends React.Component {
+  static navigationOptions = {
+    header: null,
+    headerVisible: false,
+  }
+
+  navigateTransaction = () => {
+    const { navigation } = this.props;
+    navigation.navigate('Transaction', { header: 'Own Account Transfer' })
+  }
+
   getAccountIcon = type => {
     switch (type) {
       case 'own':
@@ -46,63 +54,21 @@ class DashboardComponent extends React.Component {
   };
 
   renderTransferMode = (item, key) => (
-    <TouchableOpacity
-      key={key}
-      style={{
-        width: 150,
-        alignItems: 'center',
-        marginTop: 30,
-        borderWidth: 1,
-        borderColor: '#fff',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(52, 52, 52, 0.3)',
-      }}>
+    <TouchableOpacity onPress={this.navigateTransaction} key={key} style={styles.tileSection}>
       <Image source={this.getAccountIcon(item.accountType)} />
-      <Text
-        style={{
-          color: '#fff',
-          textAlign: 'center',
-          paddingTop: 5,
-          paddingLeft: 10,
-          paddingRight: 10,
-          paddingBottom: 10,
-        }}>
-        {item.text}{' '}
-      </Text>
+      <Text style={styles.tileText}>{item.text} </Text>
     </TouchableOpacity>
   );
   render() {
     return (
-      <View style={{flex: 1}}>
+      <View style={styles.container}>
         <ImageBackground
-          style={{height: '100%', width: '100%'}}
+          style={styles.background}
           source={require('../assets/bgvTest.jpeg')}>
-          <Text
-            style={{
-              marginTop: 15,
-              textAlign: 'center',
-              color: '#000',
-              fontSize: 22,
-            }}>
-            Transfer
-          </Text>
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            <Text
-              style={{
-                textAlign: 'center',
-                paddingLeft: '20%',
-                paddingRight: '20%',
-                color: '#e0ae22',
-                fontSize: 28,
-              }}>
-              What would you like to do?
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'space-around',
-              }}>
+          <Text style={styles.transferText}>Transfer</Text>
+          <View style={styles.likeToDo}>
+            <Text style={styles.heading}>What would you like to do?</Text>
+            <View style={styles.contentBlock}>
               {renderContent.map((item, key) =>
                 this.renderTransferMode(item, key),
               )}
@@ -113,4 +79,49 @@ class DashboardComponent extends React.Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  background: {height: '100%', width: '100%'},
+  transferText: {
+    marginTop: 15,
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 22,
+    marginTop: 40
+  },
+  likeToDo: {flex: 1, justifyContent: 'center'},
+  heading: {
+    textAlign: 'center',
+    paddingLeft: '20%',
+    paddingRight: '20%',
+    color: '#e0ae22',
+    fontSize: 28,
+  },
+  contentBlock: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  tileSection: {
+    width: 150,
+    alignItems: 'center',
+    marginTop: 30,
+    borderWidth: 1,
+    borderColor: '#fff',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(52, 52, 52, 0.3)',
+  },
+  tileText: {
+    color: '#fff',
+    textAlign: 'center',
+    paddingTop: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 10,
+  },
+});
+
 export default DashboardComponent;
